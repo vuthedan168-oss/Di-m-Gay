@@ -1,10 +1,117 @@
 /**
  * Diễm Gay - Hệ Thống Ôn Sources Chuẩn Xác 100%
- * Frontend Application Engine
+ * Frontend Application Engine with Device-Node Security
  */
+
+const SECRET_SALT = 'DIEMGAY_SECRET_SALT_2026_VUTHEDAN';
+
+const VIP_KEYS = [
+  'DG-VIP-01-9482-A7F1',
+  'DG-VIP-02-3819-B5E2',
+  'DG-VIP-03-7264-C8D3',
+  'DG-VIP-04-1945-D2C4',
+  'DG-VIP-05-5820-E6B5',
+  'DG-VIP-06-8371-F9A6',
+  'DG-VIP-07-2693-G4T7',
+  'DG-VIP-08-6154-H7S8',
+  'DG-VIP-09-4708-J1R9',
+  'DG-VIP-10-9532-K3P0'
+];
+
+const ADMIN_MASTER_KEY = 'ADMIN-DIEMGAY-9999';
+
+// Pure JavaScript FIPS 180-2 SHA-256 implementation (Works 100% offline & all origins)
+function sha256(ascii) {
+  function rightRotate(value, amount) {
+    return (value >>> amount) | (value << (32 - amount));
+  }
+  var mathPow = Math.pow;
+  var maxWord = mathPow(2, 32);
+  var lengthProperty = 'length';
+  var i, j;
+  var result = '';
+  var words = [];
+  var asciiBitLength = ascii[lengthProperty] * 8;
+  var hash = [];
+  var k = [];
+  var primeCounter = 0;
+  var isComposite = {};
+  for (var candidate = 2; primeCounter < 64; candidate++) {
+    if (!isComposite[candidate]) {
+      for (i = 0; i < 313; i += candidate) {
+        isComposite[i] = candidate;
+      }
+      hash[primeCounter] = (mathPow(candidate, .5) * maxWord) | 0;
+      k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+    }
+  }
+  ascii += '\x80';
+  while (ascii[lengthProperty] % 64 - 56) ascii += '\x00';
+  for (i = 0; i < ascii[lengthProperty]; i++) {
+    j = ascii.charCodeAt(i);
+    words[i >> 2] |= j << ((3 - i) % 4) * 8;
+  }
+  words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
+  words[words[lengthProperty]] = (asciiBitLength | 0);
+  for (j = 0; j < words[lengthProperty];) {
+    var w = words.slice(j, j += 16);
+    var oldHash = hash;
+    hash = hash.slice(0, 8);
+    for (i = 0; i < 64; i++) {
+      var w15 = w[i - 15], w2 = w[i - 2];
+      var a = hash[0], e = hash[4];
+      var temp1 = hash[7]
+        + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+        + ((e & hash[5]) ^ ((~e) & hash[6]))
+        + k[i]
+        + (w[i] = (i < 16) ? w[i] : (
+            w[i - 16]
+            + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+            + w[i - 7]
+            + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+          ) | 0
+        );
+      var temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+        + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+      hash = [(temp1 + temp2) | 0].concat(hash);
+      hash[4] = (hash[4] + temp1) | 0;
+    }
+    for (i = 0; i < 8; i++) {
+      hash[i] = (hash[i] + oldHash[i]) | 0;
+    }
+  }
+  for (i = 0; i < 8; i++) {
+    for (var i2 = 3; i2 >= 0; i2--) {
+      var b = (hash[i] >> (8 * i2)) & 255;
+      result += ((b < 16) ? 0 : '') + b.toString(16);
+    }
+  }
+  return result;
+}
+
+function getDeviceId() {
+  let devId = localStorage.getItem('diemgay_device_id');
+  if (!devId) {
+    const rand = Math.floor(1000 + Math.random() * 9000);
+    const seed = (navigator.userAgent.length * 31 + screen.width * 7 + screen.height * 11).toString(16).toUpperCase().slice(-4).padStart(4, 'A');
+    devId = 'DG-DEV-' + seed + '-' + rand;
+    localStorage.setItem('diemgay_device_id', devId);
+  }
+  return devId;
+}
+
+function generateKeyForDevice(deviceId) {
+  const clean = (deviceId || '').trim().toUpperCase();
+  const hash = sha256(clean + ':' + SECRET_SALT).toUpperCase();
+  return 'DG-KEY-' + hash.slice(0, 4) + '-' + hash.slice(4, 8) + '-' + hash.slice(8, 12);
+}
+
 
 class DiemGayApp {
   constructor() {
+    this.deviceId = getDeviceId();
+    this.isUnlocked = this.checkUnlockStatus();
+    this.logoClickCount = 0;
     this.data = window.DIEMGAY_DATA || { subjects: [], questions: {} };
     this.currentSubjectId = 'ACC101';
     this.currentTab = 'batch'; // 'batch', 'exam', 'search'
@@ -47,6 +154,25 @@ class DiemGayApp {
   }
 
   init() {
+    // Logo 5-click easter egg to open Admin Panel
+    const logoBtn = document.getElementById('brand-logo-btn');
+    if (logoBtn) {
+      logoBtn.addEventListener('click', (e) => {
+        this.logoClickCount++;
+        if (this.logoClickCount >= 5) {
+          this.logoClickCount = 0;
+          this.openAdminModal();
+        }
+      });
+    }
+
+    // Ctrl + Shift + A shortcut to open Admin Modal
+    window.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        this.openAdminModal();
+      }
+    });
     // Apply theme
     if (this.isDark) {
       document.documentElement.classList.add('dark');
@@ -1569,6 +1695,346 @@ class DiemGayApp {
       this.renderSubjectTabs();
       this.render();
     }
+  }
+
+
+  // --- SECURITY & ACTIVATION SYSTEM ---
+  checkUnlockStatus() {
+    const stored = localStorage.getItem('diemgay_license');
+    if (!stored) return false;
+    try {
+      const lic = JSON.parse(stored);
+      const myDevId = getDeviceId();
+
+      if (lic.key === ADMIN_MASTER_KEY) return true;
+
+      if (lic.key && lic.key.startsWith('DG-KEY-')) {
+        const expected = generateKeyForDevice(myDevId);
+        return lic.key === expected && lic.deviceId === myDevId;
+      }
+
+      if (lic.key && VIP_KEYS.includes(lic.key)) {
+        return lic.deviceId === myDevId;
+      }
+
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  getLicenseInfo() {
+    try {
+      const stored = localStorage.getItem('diemgay_license');
+      return stored ? JSON.parse(stored) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  updateHeaderLockState() {
+    const subjectTabs = document.getElementById('subject-tabs');
+    const headerLockBar = document.getElementById('header-lock-bar');
+    const navBtnGroup = document.getElementById('nav-btn-group');
+    const mobileNavBar = document.getElementById('mobile-nav-bar');
+    const licenseBadge = document.getElementById('license-header-badge');
+
+    if (this.isUnlocked) {
+      if (subjectTabs) subjectTabs.classList.remove('hidden');
+      if (headerLockBar) headerLockBar.classList.add('hidden');
+      if (navBtnGroup) navBtnGroup.classList.remove('hidden');
+      if (mobileNavBar) mobileNavBar.classList.remove('hidden');
+
+      if (licenseBadge) {
+        licenseBadge.innerHTML = `
+          <button onclick="app.showLicenseDetails()" title="Thiết bị đã kích hoạt hợp lệ. Nhấp để xem hoặc khóa lại" class="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-primary ring-1 ring-primary/30 hover:bg-primary hover:text-white transition shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="hidden sm:inline">Đã kích hoạt</span>
+          </button>
+        `;
+      }
+    } else {
+      if (subjectTabs) subjectTabs.classList.add('hidden');
+      if (headerLockBar) headerLockBar.classList.remove('hidden');
+      if (navBtnGroup) navBtnGroup.classList.add('hidden');
+      if (mobileNavBar) mobileNavBar.classList.add('hidden');
+
+      if (licenseBadge) {
+        licenseBadge.innerHTML = `
+          <button onclick="app.openAdminModal()" title="Thiết bị đang bị khóa. Nhấp để mở Admin duyệt mã" class="inline-flex items-center gap-1.5 rounded-full bg-danger-soft px-3 py-1 text-xs font-bold text-danger ring-1 ring-danger/30 hover:bg-danger hover:text-white transition shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span class="hidden sm:inline">Chưa mở khóa</span>
+          </button>
+        `;
+      }
+    }
+  }
+
+  renderLockScreen() {
+    return `
+      <div class="mx-auto max-w-xl px-4 py-8 sm:py-12 animate-in fade-in duration-300">
+        <div class="rounded-3xl bg-surface-raised p-6 sm:p-9 shadow-2xl ring-1 ring-subtle border border-subtle text-center">
+          
+          <!-- Glowing Shield Lock Icon -->
+          <div class="relative mx-auto size-20">
+            <div class="absolute inset-0 rounded-2xl bg-primary-solid/20 blur-xl animate-pulse-soft"></div>
+            <div class="relative grid size-20 place-items-center rounded-2xl bg-primary-soft border border-primary/30 text-primary shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Titles -->
+          <h1 class="mt-6 font-display text-2xl sm:text-3xl font-extrabold text-content tracking-tight">
+            Hệ Thống Ôn Thi Diễm Gay
+          </h1>
+          <p class="mt-1.5 text-xs sm:text-sm text-content-muted leading-relaxed">
+            Hệ thống bảo vệ nội bộ · Mỗi thành viên được cấp mã riêng gắn chặt với 1 thiết bị
+          </p>
+
+          <!-- Device ID Box -->
+          <div class="mt-6 rounded-2xl bg-surface-sunken p-4 text-left border border-subtle">
+            <div class="flex items-center justify-between text-xs text-content-muted mb-1.5 font-medium">
+              <span>Mã thiết bị của bạn (Device ID):</span>
+              <span class="rounded-full bg-danger-soft text-danger px-2 py-0.5 text-[11px] font-bold">Chưa kích hoạt</span>
+            </div>
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+              <code class="font-mono text-sm sm:text-base font-extrabold text-primary tracking-wider" id="lock-screen-device-id">${this.deviceId}</code>
+              <button onclick="app.copyDeviceId()" class="inline-flex items-center gap-1.5 rounded-full bg-surface-raised px-3.5 py-1.5 text-xs font-bold text-content border border-strong hover:bg-surface-sunken shadow-sm transition active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Sao chép gửi Admin
+              </button>
+            </div>
+            <p class="mt-2 text-[11px] text-content-subtle leading-normal">
+              👉 Hãy sao chép mã trên và gửi cho <strong>Admin Vũ Thế Đan</strong> để được cấp mã mở khóa dành riêng cho máy của bạn.
+            </p>
+          </div>
+
+          <!-- Activation Code Input Form -->
+          <div class="mt-6 text-left space-y-3">
+            <label class="block text-xs font-bold text-content">
+              Nhập mã mở khóa (Activation Key):
+            </label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input type="text" id="main-unlock-input" placeholder="Ví dụ: DG-KEY-... hoặc DG-VIP-..." 
+                onkeydown="if(event.key==='Enter') app.submitActivationCode('main')"
+                class="flex-1 rounded-xl bg-surface px-4 py-3 text-sm font-mono font-bold text-content uppercase ring-1 ring-subtle focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" />
+              <button onclick="app.submitActivationCode('main')" class="rounded-xl bg-primary-solid px-6 py-3 text-sm font-bold text-white hover:brightness-110 shadow-md shadow-primary/25 transition active:scale-95">
+                Mở khóa thiết bị
+              </button>
+            </div>
+            <div id="lock-error-msg" class="hidden rounded-xl bg-danger-soft p-3 text-xs font-semibold text-danger border border-danger/30 leading-relaxed"></div>
+          </div>
+
+          <!-- Bottom Notice -->
+          <div class="mt-8 border-t border-subtle pt-4 flex flex-wrap items-center justify-between text-xs text-content-subtle">
+            <span>🔒 Bảo mật chống rò rỉ đề thi</span>
+            <button onclick="app.openAdminModal()" class="font-semibold text-primary hover:underline">
+              Quản trị viên (Admin)
+            </button>
+          </div>
+
+        </div>
+      </div>
+    `;
+  }
+
+  submitActivationCode(source = 'main') {
+    const inputEl = source === 'header' 
+      ? document.getElementById('header-unlock-input')
+      : document.getElementById('main-unlock-input');
+
+    if (!inputEl) return;
+    const code = (inputEl.value || '').trim().toUpperCase();
+    const errorEl = document.getElementById('lock-error-msg');
+
+    if (!code) {
+      if (errorEl) {
+        errorEl.innerText = 'Vui lòng nhập mã mở khóa!';
+        errorEl.classList.remove('hidden');
+      }
+      this.showToast('Vui lòng nhập mã mở khóa!', 'warning');
+      return;
+    }
+
+    const myDevId = this.deviceId;
+
+    // Check Master Admin Key
+    if (code === ADMIN_MASTER_KEY) {
+      localStorage.setItem('diemgay_license', JSON.stringify({
+        key: code,
+        deviceId: myDevId,
+        role: 'ADMIN',
+        activatedAt: new Date().toISOString()
+      }));
+      this.isUnlocked = true;
+      this.showToast('🎉 Đã mở khóa với quyền Quản Trị Viên (Admin)!', 'success');
+      this.renderSubjectTabs();
+      this.render();
+      this.openAdminModal(true);
+      return;
+    }
+
+    // Check VIP Keys
+    if (VIP_KEYS.includes(code)) {
+      localStorage.setItem('diemgay_license', JSON.stringify({
+        key: code,
+        deviceId: myDevId,
+        role: 'VIP',
+        activatedAt: new Date().toISOString()
+      }));
+      this.isUnlocked = true;
+      this.showToast('🎉 Kích hoạt mã VIP thành công cho thiết bị này!', 'success');
+      this.renderSubjectTabs();
+      this.render();
+      return;
+    }
+
+    // Check Device-Bound Key
+    const expectedKey = generateKeyForDevice(myDevId);
+    if (code === expectedKey) {
+      localStorage.setItem('diemgay_license', JSON.stringify({
+        key: code,
+        deviceId: myDevId,
+        role: 'STUDENT',
+        activatedAt: new Date().toISOString()
+      }));
+      this.isUnlocked = true;
+      this.showToast('🎉 Kích hoạt thiết bị thành công! Chúc bạn ôn thi tốt!', 'success');
+      this.renderSubjectTabs();
+      this.render();
+      return;
+    }
+
+    // If invalid
+    const errMsg = '❌ Mã mở khóa không hợp lệ hoặc không thuộc về thiết bị này! Vui lòng sao chép mã thiết bị gửi Admin duyệt.';
+    if (errorEl) {
+      errorEl.innerText = errMsg;
+      errorEl.classList.remove('hidden');
+    }
+    this.showToast(errMsg, 'error');
+  }
+
+  copyDeviceId() {
+    navigator.clipboard.writeText(this.deviceId).then(() => {
+      this.showToast('Đã sao chép mã thiết bị: ' + this.deviceId, 'success');
+    }).catch(() => {
+      const el = document.getElementById('lock-screen-device-id');
+      if (el) {
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        this.showToast('Hãy bôi đen và nhấn Ctrl + C để sao chép!', 'info');
+      }
+    });
+  }
+
+  openAdminModal(show = true) {
+    const modal = document.getElementById('admin-modal');
+    if (!modal) return;
+
+    if (show) {
+      const lic = this.getLicenseInfo();
+      if (!this.isUnlocked || (lic && lic.role !== 'ADMIN' && lic.key !== ADMIN_MASTER_KEY)) {
+        const pass = prompt('Nhập mật mã Quản trị viên (Master Admin Key):');
+        if (pass && pass.trim().toUpperCase() === ADMIN_MASTER_KEY) {
+          localStorage.setItem('diemgay_license', JSON.stringify({
+            key: ADMIN_MASTER_KEY,
+            deviceId: this.deviceId,
+            role: 'ADMIN',
+            activatedAt: new Date().toISOString()
+          }));
+          this.isUnlocked = true;
+          this.render();
+        } else {
+          if (pass !== null) alert('Mật mã Quản trị viên không chính xác!');
+          return;
+        }
+      }
+
+      this.renderAdminVipKeys();
+      modal.classList.remove('hidden');
+    } else {
+      modal.classList.add('hidden');
+    }
+  }
+
+  renderAdminVipKeys() {
+    const container = document.getElementById('admin-vip-keys-list');
+    if (!container) return;
+
+    container.innerHTML = VIP_KEYS.map((k, idx) => `
+      <div class="flex items-center justify-between gap-2 rounded-lg bg-surface p-2 border border-subtle text-xs">
+        <div class="flex items-center gap-1.5">
+          <span class="rounded bg-surface-sunken px-1.5 py-0.5 font-bold text-[10px] text-content-muted">#${idx + 1}</span>
+          <code class="font-mono font-bold text-content select-all">${k}</code>
+        </div>
+        <button onclick="app.copyVipKey('${k}')" class="rounded px-2.5 py-1 bg-surface-raised border border-subtle hover:bg-primary hover:text-white font-semibold text-[11px] transition">
+          Copy
+        </button>
+      </div>
+    `).join('');
+  }
+
+  adminGenerateKey() {
+    const input = document.getElementById('admin-input-dev-id');
+    const outBox = document.getElementById('admin-gen-result');
+    const outCode = document.getElementById('admin-out-code');
+
+    if (!input || !outBox || !outCode) return;
+    const devId = (input.value || '').trim().toUpperCase();
+
+    if (!devId.startsWith('DG-DEV-') || devId.length < 10) {
+      alert('Vui lòng nhập đúng định dạng Mã Thiết Bị (Ví dụ: DG-DEV-A1B2-3456)');
+      return;
+    }
+
+    const key = generateKeyForDevice(devId);
+    outCode.innerText = key;
+    outBox.classList.remove('hidden');
+    this.generatedKeyForStudent = key;
+    this.showToast('Đã tạo mã thành công cho ' + devId, 'success');
+  }
+
+  copyGeneratedKey() {
+    if (this.generatedKeyForStudent) {
+      navigator.clipboard.writeText(this.generatedKeyForStudent).then(() => {
+        this.showToast('Đã sao chép mã mở khóa: ' + this.generatedKeyForStudent, 'success');
+      });
+    }
+  }
+
+  copyVipKey(key) {
+    navigator.clipboard.writeText(key).then(() => {
+      this.showToast('Đã sao chép mã VIP: ' + key, 'success');
+    });
+  }
+
+  copyAllVipKeys() {
+    const text = VIP_KEYS.map((k, i) => `Mã #${i + 1}: ${k}`).join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+      this.showToast('Đã sao chép toàn bộ 10 mã VIP!', 'success');
+    });
+  }
+
+  showLicenseDetails() {
+    const lic = this.getLicenseInfo();
+    if (!lic) return;
+    if (confirm(`Thông tin thiết bị của bạn:\n• Mã thiết bị: ${this.deviceId}\n• Khóa kích hoạt: ${lic.key}\n• Loại quyền: ${lic.role || 'THÀNH VIÊN'}\n\nBạn có muốn KHÓA LẠI thiết bị này không?`)) {
+      this.lockDevice();
+    }
+  }
+
+  lockDevice() {
+    localStorage.removeItem('diemgay_license');
+    this.isUnlocked = false;
+    this.openAdminModal(false);
+    this.showToast('Đã khóa lại thiết bị!', 'info');
+    this.render();
   }
 
   showToast(message, type = 'info') {

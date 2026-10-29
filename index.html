@@ -22,8 +22,8 @@
     <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-1.5 sm:py-2 sm:px-6">
       
       <!-- Brand Logo & Title -->
-      <div class="flex items-center gap-3">
-        <a href="#" onclick="app.setTab('batch'); return false;" class="group flex items-center gap-2.5 transition-transform active:scale-95">
+      <div class="flex items-center gap-3 shrink-0">
+        <a href="#" onclick="if(app.isUnlocked) app.setTab('batch'); return false;" class="group flex items-center gap-2.5 transition-transform active:scale-95" title="Bấm 5 lần để mở Admin Panel" id="brand-logo-btn">
           <div class="grid size-9 place-items-center rounded-xl bg-primary-solid text-primary-on-solid shadow-md shadow-primary/20">
             <!-- Graduation Cap SVG -->
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,16 +41,30 @@
         </a>
       </div>
 
-      <!-- Subject Switcher Tabs -->
-      <nav class="flex items-center gap-1 overflow-x-auto rounded-full bg-surface-sunken p-1 text-[13px] font-semibold" id="subject-tabs">
-        <!-- Injected via JavaScript -->
-      </nav>
+      <!-- Center Area: Subject Switcher Tabs (Unlocked) OR Activation Input (Locked) -->
+      <div class="flex-1 max-w-xl mx-2 flex items-center justify-center">
+        <!-- Shown when Unlocked: Subject Switcher Tabs -->
+        <nav class="flex items-center gap-1 overflow-x-auto rounded-full bg-surface-sunken p-1 text-[13px] font-semibold" id="subject-tabs">
+          <!-- Injected via JavaScript -->
+        </nav>
 
-      <!-- Right Controls: Navigation Modes & Theme -->
-      <div class="flex items-center gap-1.5 sm:gap-2">
+        <!-- Shown when Locked: Activation Input On Header (As Requested) -->
+        <div id="header-lock-bar" class="hidden w-full max-w-md flex items-center gap-1.5 rounded-full bg-surface-sunken p-1 border border-subtle animate-in fade-in">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary ml-2 shrink-0"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="text" id="header-unlock-input" placeholder="Gõ mã mở khóa tại đây..." 
+            onkeydown="if(event.key==='Enter') app.submitActivationCode('header')"
+            class="w-full bg-transparent px-2 py-1 text-xs font-mono font-bold text-content uppercase focus:outline-none placeholder:text-content-subtle placeholder:font-sans" />
+          <button onclick="app.submitActivationCode('header')" class="shrink-0 rounded-full bg-primary-solid text-white px-3.5 py-1 text-xs font-bold hover:brightness-110 shadow-sm transition active:scale-95">
+            Mở khóa
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Controls: Navigation Modes, Security & Theme -->
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
         
-        <!-- Navigation Buttons -->
-        <div class="hidden md:flex items-center gap-1">
+        <!-- Navigation Buttons (Only shown when unlocked) -->
+        <div class="hidden md:flex items-center gap-1" id="nav-btn-group">
           <button id="nav-btn-batch" onclick="app.setTab('batch')" class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors duration-150 bg-primary-solid text-primary-on-solid">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/>
@@ -73,6 +87,19 @@
           </button>
         </div>
 
+        <!-- License / Security Status Badge -->
+        <div id="license-header-badge">
+          <!-- Injected via JavaScript -->
+        </div>
+
+        <!-- Admin Shortcut Button -->
+        <button onclick="app.openAdminModal()" title="Bảng quản trị Admin" class="grid size-9 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </button>
+
         <!-- Shortcuts / Help button -->
         <button onclick="app.toggleHelpModal()" title="Phím tắt & Trợ giúp (?)" class="grid size-9 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -82,11 +109,9 @@
 
         <!-- Dark / Light Mode Toggle -->
         <button onclick="app.toggleTheme()" title="Đổi giao diện Sáng / Tối" class="grid size-9 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
-          <!-- Moon SVG (Dark mode) -->
           <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
           </svg>
-          <!-- Sun SVG (Light mode) -->
           <svg id="theme-icon-sun" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
           </svg>
@@ -104,8 +129,8 @@
       </div>
     </div>
 
-    <!-- Mobile Navigation Bar -->
-    <div class="flex md:hidden border-t border-subtle bg-surface px-3 py-1.5 justify-around text-xs font-medium">
+    <!-- Mobile Navigation Bar (Shown only when unlocked) -->
+    <div id="mobile-nav-bar" class="flex md:hidden border-t border-subtle bg-surface px-3 py-1.5 justify-around text-xs font-medium">
       <button onclick="app.setTab('batch')" id="mobile-nav-batch" class="flex flex-col items-center gap-0.5 text-primary font-semibold">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
         Chia phần
@@ -123,7 +148,7 @@
 
   <!-- MAIN APP CONTAINER -->
   <main class="flex-1 w-full" id="main-content">
-    <!-- Dynamic views will render here -->
+    <!-- Renders Lock Screen (if locked) OR Active Subject Views (if unlocked) -->
   </main>
 
   <!-- QUESTION MATRIX DRAWER / MODAL -->
@@ -152,6 +177,92 @@
         <div class="grid grid-cols-5 sm:grid-cols-6 gap-2" id="matrix-grid">
           <!-- Injected via JavaScript -->
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN MANAGEMENT & LICENSE MODAL -->
+  <div id="admin-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm grid place-items-center p-4" onclick="if(event.target === this) app.openAdminModal(false)">
+    <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-surface-raised p-6 sm:p-7 shadow-2xl border border-subtle animate-in zoom-in-95 duration-150">
+      <div class="flex items-center justify-between border-b border-subtle pb-4">
+        <div class="flex items-center gap-2.5">
+          <div class="grid size-9 place-items-center rounded-xl bg-primary-solid text-white font-bold">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div>
+            <h3 class="font-display text-lg font-bold text-content">Quản Trị Duyệt Mã (Admin Diễm Gay)</h3>
+            <p class="text-xs text-content-muted">Cấp mã khóa thiết bị độc quyền hoặc quản lý 10 mã VIP</p>
+          </div>
+        </div>
+        <button onclick="app.openAdminModal(false)" class="grid size-8 place-items-center rounded-full hover:bg-surface-sunken text-content-muted">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="mt-5 space-y-6 text-sm">
+        
+        <!-- Section 1: Device-Bound Code Generator -->
+        <div class="rounded-xl bg-surface-sunken p-4 sm:p-5 border border-subtle">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="rounded-full bg-primary-soft text-primary px-2 py-0.5 text-xs font-bold">Phương thức 1</span>
+            <h4 class="font-bold text-content text-sm sm:text-base">Duyệt cấp mã khóa theo thiết bị của sinh viên</h4>
+          </div>
+          <p class="text-xs text-content-muted leading-relaxed mb-3">
+            Khi sinh viên mở web, màn hình khóa sẽ hiện "Mã thiết bị của bạn". Hãy yêu cầu sinh viên sao chép mã đó và gửi cho bạn. Bạn chỉ cần dán vào ô dưới đây để tạo mã mở khóa riêng chỉ máy bạn đó dùng được:
+          </p>
+
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-content-muted mb-1">Mã thiết bị của sinh viên (Device ID):</label>
+              <div class="flex gap-2">
+                <input type="text" id="admin-input-dev-id" placeholder="Ví dụ: DG-DEV-A1B2-3456" class="flex-1 rounded-xl bg-surface px-3.5 py-2 text-xs font-mono font-bold text-content uppercase ring-1 ring-subtle focus:ring-2 focus:ring-primary" />
+                <button onclick="app.adminGenerateKey()" class="rounded-xl bg-primary-solid px-4 py-2 text-xs font-bold text-white hover:brightness-110 shadow-sm transition">
+                  Duyệt & Tạo mã
+                </button>
+              </div>
+            </div>
+
+            <!-- Result output -->
+            <div id="admin-gen-result" class="hidden rounded-xl bg-primary-soft/60 p-3.5 border border-primary/30 flex items-center justify-between gap-2">
+              <div>
+                <span class="text-[11px] font-bold text-primary uppercase tracking-wide block">Mã mở khóa thiết bị (Gửi mã này cho bạn sinh viên):</span>
+                <code class="font-mono text-sm sm:text-base font-extrabold text-primary" id="admin-out-code"></code>
+              </div>
+              <button onclick="app.copyGeneratedKey()" class="rounded-lg bg-primary-solid text-white px-3 py-1.5 text-xs font-bold hover:brightness-110 transition shrink-0">
+                Sao chép mã
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: 10 Pre-generated VIP Keys -->
+        <div class="rounded-xl bg-surface-sunken p-4 sm:p-5 border border-subtle">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2">
+              <span class="rounded-full bg-warning-soft text-warning px-2 py-0.5 text-xs font-bold">Phương thức 2</span>
+              <h4 class="font-bold text-content text-sm sm:text-base">Danh sách 10 Mã Mở Khóa VIP cấp sẵn</h4>
+            </div>
+            <button onclick="app.copyAllVipKeys()" class="text-xs font-semibold text-primary hover:underline">
+              Sao chép cả 10 mã
+            </button>
+          </div>
+          <p class="text-xs text-content-muted leading-relaxed mb-3">
+            Bạn có thể gửi trực tiếp từng mã dưới đây cho 10 bạn bè. Mỗi mã được dùng để kích hoạt cho 1 máy:
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto" id="admin-vip-keys-list">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Section 3: Device Actions -->
+        <div class="border-t border-subtle pt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-content-muted">
+          <span>Mã Master Admin: <strong class="font-mono text-primary">ADMIN-DIEMGAY-9999</strong></span>
+          <button onclick="app.lockDevice()" class="rounded-full border border-danger/40 text-danger bg-danger-soft/40 px-3.5 py-1.5 font-bold hover:bg-danger hover:text-white transition">
+            Khóa lại thiết bị này
+          </button>
+        </div>
+
       </div>
     </div>
   </div>
@@ -246,4 +357,3 @@
   <script src="app.js"></script>
 </body>
 </html>
-
