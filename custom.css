@@ -1,0 +1,266 @@
+/* Tùy chỉnh bổ sung cho Hệ thống ôn thi Diễm Gay */
+:root {
+  --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: 'Sora', 'Be Vietnam Pro', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--a4h-surface);
+  color: var(--a4h-content);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* 3D Flashcard styles */
+.perspective-1600 {
+  perspective: 1600px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.is-flipped {
+  transform: rotateY(180deg) !important;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Custom smooth transitions */
+.ease-product {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Scrollbar polish */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--a4h-border-strong);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--a4h-content-subtle);
+}
+
+/* Keyboard hint badges */
+.kbd-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--a4h-content-muted);
+  background: var(--a4h-surface-sunken);
+  border: 1px solid var(--a4h-border-subtle);
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06);
+}
+
+/* Subtle glow animations */
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Highlighting searched text */
+mark.search-highlight {
+  background-color: #fef08a;
+  color: #854d0e;
+  padding: 0.1em 0.2em;
+  border-radius: 0.2em;
+  font-weight: 600;
+}
+.dark mark.search-highlight {
+  background-color: #854d0e;
+  color: #fef08a;
+}
+
+/* ========================================================= */
+/* NÚT BẤM SÁNG RÕ CHO CẢ LIGHT & DARK MODE                  */
+/* ========================================================= */
+
+/* Nút điều hướng nổi bật (< Danh sách phần, Ma trận câu, Chia lại) */
+.btn-prominent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  background-color: var(--a4h-surface-raised);
+  color: var(--a4h-content);
+  border: 1px solid var(--a4h-border-strong);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: all 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+.btn-prominent:hover {
+  background-color: var(--a4h-surface-sunken);
+  color: var(--a4h-content);
+  border-color: var(--a4h-primary);
+  transform: translateY(-0.5px);
+}
+
+.dark .btn-prominent {
+  background-color: #262420;
+  color: #f4f1ec !important;
+  border: 1px solid #5a5349 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.dark .btn-prominent:hover {
+  background-color: #38342d !important;
+  color: #ffffff !important;
+  border-color: #8c8273 !important;
+}
+
+/* Khung toggle Học / Thẻ ghi nhớ */
+.mode-toggle-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  background-color: var(--a4h-surface-sunken);
+  border: 1px solid var(--a4h-border-subtle);
+}
+
+.dark .mode-toggle-container {
+  background-color: #1e1d1a;
+  border-color: #44403a;
+}
+
+.mode-toggle-btn {
+  padding: 0.35rem 0.95rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  transition: all 0.15s ease;
+  color: var(--a4h-content-muted);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+.mode-toggle-btn:hover {
+  color: var(--a4h-content);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .mode-toggle-btn {
+  color: #d1cbc2;
+}
+
+.dark .mode-toggle-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mode-toggle-btn.is-active {
+  background-color: #15803d !important; /* Đậm nét và rực rỡ */
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(21, 128, 61, 0.35);
+}
+
+/* Nút Học (Màu xanh lá đậm rõ nét) ở danh sách các phần */
+.btn-part-hoc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  background-color: #15803d !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  transition: all 0.15s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-part-hoc:hover {
+  background-color: #16a34a !important;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(21, 128, 61, 0.3);
+}
+
+/* Nút Thẻ ghi nhớ (Viền sáng rõ nét) ở danh sách các phần */
+.btn-part-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  background-color: var(--a4h-surface-raised);
+  color: var(--a4h-content);
+  border: 1px solid var(--a4h-border-strong);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.btn-part-card:hover {
+  background-color: var(--a4h-surface-sunken);
+  border-color: var(--a4h-primary);
+  transform: translateY(-1px);
+}
+
+.dark .btn-part-card {
+  background-color: #262420;
+  color: #f4f1ec !important;
+  border: 1px solid #5a5349 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.dark .btn-part-card:hover {
+  background-color: #38342d !important;
+  color: #ffffff !important;
+  border-color: #8c8273 !important;
+}
+
+/* ========================================================= */
+/* KHUNG HÌNH ÔN THI GỌN GÀNG, KHÔNG BỊ TRÀN CUỘN MÀN HÌNH    */
+/* ========================================================= */
+.session-compact-card {
+  max-height: calc(100vh - 12rem);
+  display: flex;
+  flex-direction: column;
+}
+
+.session-options-scroll {
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  max-height: calc(100vh - 22rem);
+}

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Diễm Gay | Hệ Thống Ôn Sources Chuẩn Xác 100%</title>
+  <meta name="description" content="Nền tảng ôn thi Smart Sources - Diễm Gay. Đầy đủ các môn ACC101, MGT103, ECO102 với chế độ Flashcard, Trắc nghiệm, Thi thử và Tra cứu." />
+  
+  <!-- Google Fonts: Be Vietnam Pro & Sora -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Authentic Stylesheets -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="custom.css" />
+</head>
+<body class="bg-surface text-content antialiased min-h-screen flex flex-col">
+  
+  <!-- APP HEADER -->
+  <header class="sticky top-0 z-40 border-b border-subtle bg-surface-raised/95 backdrop-blur shadow-sm">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-1.5 sm:py-2 sm:px-6">
+      
+      <!-- Brand Logo & Title -->
+      <div class="flex items-center gap-3">
+        <a href="#" onclick="app.setTab('batch'); return false;" class="group flex items-center gap-2.5 transition-transform active:scale-95">
+          <div class="grid size-9 place-items-center rounded-xl bg-primary-solid text-primary-on-solid shadow-md shadow-primary/20">
+            <!-- Graduation Cap SVG -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+              <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-1.5">
+              <span class="font-display text-lg font-bold tracking-tight text-content group-hover:text-primary transition-colors">Diễm Gay</span>
+              <span class="rounded-full bg-primary-soft px-2 py-0.5 text-[11px] font-semibold text-primary">Sources Pro</span>
+            </div>
+            <span class="text-[11px] font-medium text-content-subtle">Tôi bị gay 100% là sự thực.</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Subject Switcher Tabs -->
+      <nav class="flex items-center gap-1 overflow-x-auto rounded-full bg-surface-sunken p-1 text-[13px] font-semibold" id="subject-tabs">
+        <!-- Injected via JavaScript -->
+      </nav>
+
+      <!-- Right Controls: Navigation Modes & Theme -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        
+        <!-- Navigation Buttons -->
+        <div class="hidden md:flex items-center gap-1">
+          <button id="nav-btn-batch" onclick="app.setTab('batch')" class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors duration-150 bg-primary-solid text-primary-on-solid">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/>
+            </svg>
+            Chia phần
+          </button>
+          
+          <button id="nav-btn-exam" onclick="app.setTab('exam')" class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-semibold text-content-muted hover:bg-surface-sunken hover:text-content transition-colors duration-150">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Thi thử
+          </button>
+
+          <button id="nav-btn-search" onclick="app.setTab('search')" class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-semibold text-content-muted hover:bg-surface-sunken hover:text-content transition-colors duration-150">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+            </svg>
+            Tra cứu
+          </button>
+        </div>
+
+        <!-- Shortcuts / Help button -->
+        <button onclick="app.toggleHelpModal()" title="Phím tắt & Trợ giúp (?)" class="grid size-9 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </button>
+
+        <!-- Dark / Light Mode Toggle -->
+        <button onclick="app.toggleTheme()" title="Đổi giao diện Sáng / Tối" class="grid size-9 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
+          <!-- Moon SVG (Dark mode) -->
+          <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+          </svg>
+          <!-- Sun SVG (Light mode) -->
+          <svg id="theme-icon-sun" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+        </button>
+
+        <!-- Progress / Data Backup -->
+        <button onclick="app.openDataModal()" title="Tiến độ & Sao lưu" class="grid size-9 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Bar -->
+    <div class="flex md:hidden border-t border-subtle bg-surface px-3 py-1.5 justify-around text-xs font-medium">
+      <button onclick="app.setTab('batch')" id="mobile-nav-batch" class="flex flex-col items-center gap-0.5 text-primary font-semibold">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+        Chia phần
+      </button>
+      <button onclick="app.setTab('exam')" id="mobile-nav-exam" class="flex flex-col items-center gap-0.5 text-content-muted">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Thi thử
+      </button>
+      <button onclick="app.setTab('search')" id="mobile-nav-search" class="flex flex-col items-center gap-0.5 text-content-muted">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        Tra cứu
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <main class="flex-1 w-full" id="main-content">
+    <!-- Dynamic views will render here -->
+  </main>
+
+  <!-- QUESTION MATRIX DRAWER / MODAL -->
+  <div id="matrix-drawer" class="fixed inset-0 z-50 hidden bg-black/40 backdrop-blur-sm transition-opacity" onclick="if(event.target === this) app.toggleMatrixDrawer(false)">
+    <div class="fixed inset-y-0 right-0 w-full max-w-md bg-surface-raised shadow-2xl p-5 flex flex-col border-l border-subtle animate-in slide-in-from-right duration-200">
+      <div class="flex items-center justify-between border-b border-subtle pb-3">
+        <div class="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          <h3 class="font-display text-base font-semibold text-content" id="matrix-title">Ma trận câu hỏi</h3>
+        </div>
+        <button onclick="app.toggleMatrixDrawer(false)" class="grid size-8 place-items-center rounded-full hover:bg-surface-sunken text-content-muted">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Legend -->
+      <div class="flex flex-wrap items-center gap-3 py-3 text-xs text-content-muted border-b border-subtle">
+        <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-primary-solid"></span> Đang làm</span>
+        <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-primary-soft ring-1 ring-primary"></span> Đã thuộc</span>
+        <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-warning"></span> Cần học lại</span>
+        <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-full bg-surface-sunken ring-1 ring-strong"></span> Chưa làm</span>
+      </div>
+
+      <!-- Grid of question buttons -->
+      <div class="flex-1 overflow-y-auto py-4">
+        <div class="grid grid-cols-5 sm:grid-cols-6 gap-2" id="matrix-grid">
+          <!-- Injected via JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHORTCUTS & HELP MODAL -->
+  <div id="help-modal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm grid place-items-center p-4" onclick="if(event.target === this) app.toggleHelpModal(false)">
+    <div class="w-full max-w-lg rounded-2xl bg-surface-raised p-6 shadow-2xl border border-subtle animate-in zoom-in-95 duration-150">
+      <div class="flex items-center justify-between border-b border-subtle pb-3">
+        <div class="flex items-center gap-2">
+          <span class="grid size-8 place-items-center rounded-full bg-primary-soft text-primary font-bold">?</span>
+          <h3 class="font-display text-lg font-bold text-content">Phím tắt ôn thi</h3>
+        </div>
+        <button onclick="app.toggleHelpModal(false)" class="grid size-8 place-items-center rounded-full hover:bg-surface-sunken text-content-muted">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-4 text-sm">
+        <div>
+          <h4 class="font-semibold text-primary mb-2">Chế độ Học (Trắc nghiệm tương tác)</h4>
+          <ul class="space-y-1.5 text-content-muted">
+            <li class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="kbd-badge">A</span> <span class="kbd-badge">B</span> <span class="kbd-badge">C</span> <span class="kbd-badge">D</span></span> <span>Chọn phương án tương ứng</span></li>
+            <li class="flex items-center justify-between"><span class="kbd-badge">Enter</span> <span>Kiểm tra đáp án / Chuyển câu kế</span></li>
+            <li class="flex items-center justify-between"><span class="kbd-badge">1</span> <span>Đánh dấu "Cần học lại"</span></li>
+            <li class="flex items-center justify-between"><span class="kbd-badge">2</span> <span>Đánh dấu "Đã thuộc"</span></li>
+            <li class="flex items-center justify-between"><span class="flex items-center gap-1"><span class="kbd-badge">←</span> <span class="kbd-badge">→</span></span> <span>Chuyển câu trước / câu sau</span></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="font-semibold text-primary mb-2">Chế độ Thẻ ghi nhớ (Flashcard 3D)</h4>
+          <ul class="space-y-1.5 text-content-muted">
+            <li class="flex items-center justify-between"><span class="kbd-badge">Space</span> hoặc <span class="kbd-badge">Enter</span> <span>Lật thẻ xem đáp án</span></li>
+            <li class="flex items-center justify-between"><span class="kbd-badge">1</span> <span>Đánh dấu "Cần học lại"</span></li>
+            <li class="flex items-center justify-between"><span class="kbd-badge">2</span> <span>Đánh dấu "Đã thuộc"</span></li>
+            <li class="flex items-center justify-between"><span class="flex items-center gap-1"><span class="kbd-badge">←</span> <span class="kbd-badge">→</span></span> <span>Lùi về thẻ trước / Sang thẻ tiếp theo</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-6 border-t border-subtle pt-4 flex justify-end">
+        <button onclick="app.toggleHelpModal(false)" class="rounded-full bg-primary-solid px-5 py-2 text-sm font-semibold text-primary-on-solid hover:brightness-95">Đã hiểu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA & BACKUP MODAL -->
+  <div id="data-modal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm grid place-items-center p-4" onclick="if(event.target === this) app.openDataModal(false)">
+    <div class="w-full max-w-lg rounded-2xl bg-surface-raised p-6 shadow-2xl border border-subtle animate-in zoom-in-95 duration-150">
+      <div class="flex items-center justify-between border-b border-subtle pb-3">
+        <h3 class="font-display text-lg font-bold text-content">Quản lý Tiến độ Ôn thi</h3>
+        <button onclick="app.openDataModal(false)" class="grid size-8 place-items-center rounded-full hover:bg-surface-sunken text-content-muted">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-4 text-sm">
+        <p class="text-content-muted leading-relaxed">
+          Toàn bộ tiến độ học tập (các câu đã thuộc, câu cần học lại, các phần đã làm) được lưu trực tiếp trên trình duyệt của máy bạn, hoàn toàn bảo mật và không bị giới hạn số người dùng.
+        </p>
+
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <button onclick="app.exportProgress()" class="flex flex-col items-center gap-1.5 rounded-xl border border-subtle p-3.5 hover:bg-surface-sunken transition-colors text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span class="font-semibold text-content">Xuất tiến độ</span>
+            <span class="text-xs text-content-subtle">Tải file sao lưu (.json)</span>
+          </button>
+
+          <label class="flex flex-col items-center gap-1.5 rounded-xl border border-subtle p-3.5 hover:bg-surface-sunken transition-colors text-center cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span class="font-semibold text-content">Nhập tiến độ</span>
+            <span class="text-xs text-content-subtle">Đọc file backup để khôi phục</span>
+            <input type="file" accept=".json" class="hidden" onchange="app.importProgress(this)" />
+          </label>
+        </div>
+
+        <div class="border-t border-subtle pt-4">
+          <button onclick="app.resetCurrentSubjectProgress()" class="w-full flex items-center justify-center gap-2 rounded-xl bg-danger-soft text-danger p-3 font-semibold text-sm hover:brightness-95 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            Làm lại từ đầu môn này (Reset tiến độ)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- SCRIPTS -->
+  <script src="data/questions_data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,6 @@
+# Bảo mật: Không đưa file HAR chứa token đăng nhập lên GitHub
+HAR
+*.har
+_tools/
+.DS_Store
+*.log
