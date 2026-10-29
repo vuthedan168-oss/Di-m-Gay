@@ -23,6 +23,21 @@ body {
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+#flashcard-element {
+  min-height: 22rem !important;
+  height: 25rem !important;
+  width: 100% !important;
+  position: relative !important;
+  display: block !important;
+}
+
+@media (min-width: 640px) {
+  #flashcard-element {
+    min-height: 25rem !important;
+    height: 27rem !important;
+  }
+}
+
 .is-flipped {
   transform: rotateY(180deg) !important;
 }

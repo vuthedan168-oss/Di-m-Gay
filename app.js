@@ -941,7 +941,7 @@ class DiemGayApp {
         
         <!-- 3D Card Container -->
         <div class="perspective-1600 w-full">
-          <div id="flashcard-element" onclick="app.flipCard()" class="relative h-[20rem] sm:h-[22rem] w-full cursor-pointer rounded-2xl transform-style-3d shadow-card transition-all duration-300 ${
+          <div id="flashcard-element" onclick="app.flipCard()" style="min-height: 22rem; height: 25rem;" class="relative w-full cursor-pointer rounded-2xl transform-style-3d shadow-card transition-all duration-300 ${
             this.isCardFlipped ? 'is-flipped' : ''
           }">
             
