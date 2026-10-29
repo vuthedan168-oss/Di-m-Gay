@@ -2045,6 +2045,36 @@ class DiemGayApp {
     });
   }
 
+  isAdmin() {
+    const lic = this.getLicenseInfo();
+    return !!(lic && (lic.role === 'ADMIN' || lic.key === ADMIN_MASTER_KEY));
+  }
+
+  promptAdminLogin() {
+    const pass = prompt('Nhập mật khẩu Quản trị viên (Master Admin Key) để mở bảng điều khiển:');
+    if (!pass) return;
+    if (pass.trim().toUpperCase() === ADMIN_MASTER_KEY) {
+      localStorage.setItem('diemgay_license', JSON.stringify({
+        key: ADMIN_MASTER_KEY,
+        deviceId: this.deviceId,
+        role: 'ADMIN',
+        activatedAt: new Date().toISOString()
+      }));
+      this.isUnlocked = true;
+      this.showToast('✓ Đăng nhập Quản trị viên (Admin) thành công!', 'success');
+      this.openAdminModal(true);
+      this.renderSubjectTabs();
+      this.render();
+    } else {
+      alert('❌ Mật khẩu Quản trị viên không chính xác!');
+    }
+  }
+
+  hideAdminTools() {
+    const adminTools = document.getElementById('admin-tools-panel');
+    if (adminTools) adminTools.classList.add('hidden');
+  }
+
   openAdminModal(show = true) {
     const modal = document.getElementById('admin-modal');
     if (!modal) return;
@@ -2072,8 +2102,23 @@ class DiemGayApp {
         }
       }
 
-      // 4. Render 10 VIP keys
-      this.renderAdminVipKeys();
+      // 4. BẢO MẬT TUYỆT ĐỐI: CHỈ ADMIN MỚI THẤY 10 MÃ VIP VÀ CÔNG CỤ DUYỆT!
+      const adminTools = document.getElementById('admin-tools-panel');
+      const adminLoginPrompt = document.getElementById('admin-login-prompt');
+      const adminActiveStatus = document.getElementById('admin-active-status');
+
+      if (this.isAdmin()) {
+        // Nếu là Admin thì hiển thị bảng duyệt và 10 mã VIP
+        if (adminTools) adminTools.classList.remove('hidden');
+        if (adminLoginPrompt) adminLoginPrompt.classList.add('hidden');
+        if (adminActiveStatus) adminActiveStatus.classList.remove('hidden');
+        this.renderAdminVipKeys();
+      } else {
+        // HỌC VIÊN HOÀN TOÀN KHÔNG THẤY 10 MÃ VIP VÀ BỘ TẠO MÃ!
+        if (adminTools) adminTools.classList.add('hidden');
+        if (adminLoginPrompt) adminLoginPrompt.classList.remove('hidden');
+        if (adminActiveStatus) adminActiveStatus.classList.add('hidden');
+      }
 
       modal.classList.remove('hidden');
     } else {

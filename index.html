@@ -261,8 +261,19 @@
           </div>
         </div>
         
-        <!-- ADMIN AREA: GENERATOR & VIP KEYS -->
-        <div id="admin-tools-panel" class="space-y-5">
+        <!-- ADMIN AREA: GENERATOR & VIP KEYS (CHỈ HIỂN THỊ KHI ADMIN ĐĂNG NHẬP, HỌC VIÊN HOÀN TOÀN KHÔNG THẤY) -->
+        <div id="admin-tools-panel" class="hidden space-y-5 animate-in fade-in">
+          
+          <div class="rounded-xl bg-primary-soft/40 p-3 border border-primary/30 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-xs font-bold text-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+              <span>Khu vực Quản Trị Viên (Admin Vũ Thế Đan) — Tuyệt mật</span>
+            </div>
+            <button type="button" onclick="app.hideAdminTools()" class="text-xs font-semibold text-content-muted hover:text-content">
+              Ẩn bảng Admin
+            </button>
+          </div>
+
           <!-- Section 1: Device-Bound Code Generator -->
           <div class="rounded-xl bg-surface-sunken p-4 sm:p-5 border border-subtle">
             <div class="flex items-center gap-2 mb-2">
@@ -318,11 +329,25 @@
           </div>
         </div>
 
-        <!-- Section 3: Device Actions -->
+        <!-- Section 3: Bottom Control Bar -->
         <div class="border-t border-subtle pt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-content-muted">
-          <span>Mã Master Admin: <strong class="font-mono text-primary">ADMIN-DIEMGAY-9999</strong></span>
-          <div class="flex items-center gap-2">
-            <button type="button" onclick="app.lockDevice()" class="rounded-full border border-danger/40 text-danger bg-danger-soft/40 px-3.5 py-1.5 font-bold hover:bg-danger hover:text-white transition">
+          <!-- Admin mode toggle prompt -->
+          <div id="admin-login-prompt">
+            <button type="button" onclick="app.promptAdminLogin()" class="inline-flex items-center gap-1.5 text-content-subtle hover:text-primary transition font-semibold">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>Chế độ Quản trị viên (Chỉ dành cho Admin Đan)</span>
+            </button>
+          </div>
+
+          <div id="admin-active-status" class="hidden flex items-center gap-2">
+            <span class="text-primary font-bold flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Đang ở quyền Quản Trị Viên (Admin)
+            </span>
+          </div>
+
+          <div class="ml-auto">
+            <button type="button" onclick="app.lockDevice()" class="text-xs text-content-subtle hover:text-danger transition">
               Khóa lại thiết bị này
             </button>
           </div>
