@@ -294,13 +294,13 @@ class DiemGayApp {
       const pct = total > 0 ? Math.round((knowCount / total) * 100) : 0;
 
       return `
-        <button onclick="app.setSubject('${s.id}')" class="inline-flex items-center gap-2 rounded-full px-3 py-1.5 transition-all ${
+        <button type="button" onclick="app.setSubject('${s.id}')" class="subject-tab-btn ${
           active
             ? 'bg-surface-raised font-bold text-primary shadow-sm ring-1 ring-subtle'
             : 'text-content-muted hover:text-content hover:bg-surface/50'
         }">
-          <span>${s.code}</span>
-          <span class="rounded-full px-1.5 py-0.2 text-[10px] font-semibold ${
+          <span class="tracking-tight">${s.code}</span>
+          <span class="subject-tab-badge ${
             active ? 'bg-primary-soft text-primary' : 'bg-surface-sunken text-content-subtle'
           }">${total} câu · ${pct}%</span>
         </button>
@@ -1831,40 +1831,13 @@ class DiemGayApp {
 
   updateHeaderLockState() {
     const subjectTabs = document.getElementById('subject-tabs');
-    const headerLockBar = document.getElementById('header-lock-bar');
     const navBtnGroup = document.getElementById('nav-btn-group');
     const mobileNavBar = document.getElementById('mobile-nav-bar');
-    const licenseBadge = document.getElementById('license-header-badge');
 
-    if (this.isUnlocked) {
-      if (subjectTabs) subjectTabs.classList.remove('hidden');
-      if (headerLockBar) headerLockBar.classList.add('hidden');
-      if (navBtnGroup) navBtnGroup.classList.remove('hidden');
-      if (mobileNavBar) mobileNavBar.classList.remove('hidden');
-
-      if (licenseBadge) {
-        licenseBadge.innerHTML = `
-          <button onclick="app.showLicenseDetails()" title="Thiết bị đã kích hoạt hợp lệ. Nhấp để xem hoặc khóa lại" class="inline-flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-primary ring-1 ring-primary/30 hover:bg-primary hover:text-white transition shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            <span class="hidden sm:inline">Đã kích hoạt</span>
-          </button>
-        `;
-      }
-    } else {
-      if (subjectTabs) subjectTabs.classList.add('hidden');
-      if (headerLockBar) headerLockBar.classList.remove('hidden');
-      if (navBtnGroup) navBtnGroup.classList.add('hidden');
-      if (mobileNavBar) mobileNavBar.classList.add('hidden');
-
-      if (licenseBadge) {
-        licenseBadge.innerHTML = `
-          <button onclick="app.openAdminModal()" title="Thiết bị đang bị khóa. Nhấp để mở Admin duyệt mã" class="inline-flex items-center gap-1.5 rounded-full bg-danger-soft px-3 py-1 text-xs font-bold text-danger ring-1 ring-danger/30 hover:bg-danger hover:text-white transition shadow-sm">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <span class="hidden sm:inline">Chưa mở khóa</span>
-          </button>
-        `;
-      }
-    }
+    // 3 môn luôn hiển thị rõ ràng, nằm ngang để người dùng chọn môn bất cứ lúc nào
+    if (subjectTabs) subjectTabs.classList.remove('hidden');
+    if (navBtnGroup) navBtnGroup.classList.remove('hidden');
+    if (mobileNavBar) mobileNavBar.classList.remove('hidden');
   }
 
   renderLockScreen() {

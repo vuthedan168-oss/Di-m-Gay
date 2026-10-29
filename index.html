@@ -49,85 +49,65 @@
         </a>
       </div>
 
-      <!-- Center Area: Subject Switcher Tabs (Unlocked) OR Activation Input (Locked) -->
-      <div class="flex-1 max-w-xl mx-2 flex items-center justify-center">
-        <!-- Shown when Unlocked: Subject Switcher Tabs -->
-        <nav class="flex items-center gap-1 overflow-x-auto rounded-full bg-surface-sunken p-1 text-[13px] font-semibold" id="subject-tabs">
+      <!-- Center Area: Subject Switcher Tabs (3 môn hiển thị ngang, gọn gàng, không bị vỡ dòng) -->
+      <div class="flex items-center justify-center shrink-0 mx-2">
+        <nav class="flex items-center gap-1.5 rounded-full bg-surface-sunken p-1 text-xs font-semibold" id="subject-tabs">
           <!-- Injected via JavaScript -->
         </nav>
-
-        <!-- Shown when Locked: Activation Input On Header (As Requested) -->
-        <div id="header-lock-bar" class="hidden w-full max-w-md flex items-center gap-1.5 rounded-full bg-surface-sunken p-1 border border-subtle animate-in fade-in">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary ml-2 shrink-0"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <input type="text" id="header-unlock-input" placeholder="Gõ mã mở khóa tại đây..." 
-            onkeydown="if(event.key==='Enter') app.submitActivationCode('header')"
-            class="w-full bg-transparent px-2 py-1 text-xs font-mono font-bold text-content uppercase focus:outline-none placeholder:text-content-subtle placeholder:font-sans" />
-          <button onclick="app.submitActivationCode('header')" class="shrink-0 rounded-full bg-primary-solid text-white px-3.5 py-1 text-xs font-bold hover:brightness-110 shadow-sm transition active:scale-95">
-            Mở khóa
-          </button>
-        </div>
       </div>
 
-      <!-- Right Controls: Navigation Modes, Security & Theme -->
-      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <!-- Right Controls: Navigation Modes & Utilities (Không thừa nút, không tràn màn hình) -->
+      <div class="flex items-center gap-1 sm:gap-1.5 shrink-0">
         
-        <!-- Navigation Buttons (Only shown when unlocked) -->
+        <!-- Navigation Buttons -->
         <div class="hidden md:flex items-center gap-1" id="nav-btn-group">
-          <button id="nav-btn-batch" onclick="app.setTab('batch')" class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors duration-150 bg-primary-solid text-primary-on-solid">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button id="nav-btn-batch" onclick="app.setTab('batch')" class="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors duration-150 bg-primary-solid text-primary-on-solid whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/>
             </svg>
             Chia phần
           </button>
           
-          <button id="nav-btn-exam" onclick="app.setTab('exam')" class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-semibold text-content-muted hover:bg-surface-sunken hover:text-content transition-colors duration-150">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button id="nav-btn-exam" onclick="app.setTab('exam')" class="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-content-muted hover:bg-surface-sunken hover:text-content transition-colors duration-150 whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
             Thi thử
           </button>
 
-          <button id="nav-btn-search" onclick="app.setTab('search')" class="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-semibold text-content-muted hover:bg-surface-sunken hover:text-content transition-colors duration-150">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <button id="nav-btn-search" onclick="app.setTab('search')" class="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-content-muted hover:bg-surface-sunken hover:text-content transition-colors duration-150 whitespace-nowrap">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
             </svg>
             Tra cứu
           </button>
         </div>
 
-        <!-- License / Security Status Badge -->
-        <div id="license-header-badge">
-          <!-- Injected via JavaScript -->
-        </div>
-
-        <!-- Admin Shortcut Button -->
-        <button onclick="app.openAdminModal()" title="Bảng quản trị Admin" class="grid size-9 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
-            <path d="m9 12 2 2 4-4"/>
-          </svg>
-        </button>
-
         <!-- Shortcuts / Help button -->
-        <button onclick="app.toggleHelpModal()" title="Phím tắt & Trợ giúp (?)" class="grid size-9 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button onclick="app.toggleHelpModal()" title="Phím tắt & Trợ giúp (?)" class="grid size-8 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/><path d="9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </button>
 
         <!-- Dark / Light Mode Toggle -->
-        <button onclick="app.toggleTheme()" title="Đổi giao diện Sáng / Tối" class="grid size-9 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
-          <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button onclick="app.toggleTheme()" title="Đổi giao diện Sáng / Tối" class="grid size-8 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
+          <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
           </svg>
-          <svg id="theme-icon-sun" class="hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg id="theme-icon-sun" class="hidden" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
           </svg>
         </button>
 
         <!-- Progress / Data Backup -->
-        <button onclick="app.openDataModal()" title="Tiến độ & Sao lưu" class="grid size-9 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button onclick="app.openDataModal()" title="Tiến độ & Sao lưu" class="grid size-8 shrink-0 place-items-center rounded-full text-content-muted hover:bg-surface-sunken hover:text-content transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+        </button>
             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
             <polyline points="17 21 17 13 7 13 7 21"/>
             <polyline points="7 3 7 8 15 8"/>

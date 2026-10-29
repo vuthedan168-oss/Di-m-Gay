@@ -362,6 +362,37 @@ mark.search-highlight {
 }
 
 /* ========================================================= */
+/* THANH CHỌN 3 MÔN HỌC (ACC101, MGT103, ECO102) NGANG GỌN GÀNG */
+/* ========================================================= */
+.subject-tab-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+  padding: 0.35rem 0.75rem !important;
+  border-radius: 9999px !important;
+  font-size: 0.8125rem !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  transition: all 0.15s ease !important;
+  line-height: 1.25 !important;
+  cursor: pointer;
+}
+
+.subject-tab-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 0.125rem 0.5rem !important;
+  border-radius: 9999px !important;
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+  letter-spacing: -0.01em !important;
+  font-variant-numeric: tabular-nums !important;
+  line-height: 1.1 !important;
+}
+
+/* ========================================================= */
 /* KHUNG HÌNH ÔN THI GỌN GÀNG, KHÔNG BỊ TRÀN CUỘN MÀN HÌNH    */
 /* ========================================================= */
 .session-compact-card {
