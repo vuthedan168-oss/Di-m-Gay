@@ -32,9 +32,17 @@
             </svg>
           </div>
           <div class="flex flex-col">
-            <div class="flex items-center gap-1.5">
+            <div class="flex items-center gap-1.5 flex-wrap">
               <span class="font-display text-lg font-bold tracking-tight text-content group-hover:text-primary transition-colors">Diễm Gay</span>
               <span class="rounded-full bg-primary-soft px-2 py-0.5 text-[11px] font-semibold text-primary">Sources Pro</span>
+              
+              <!-- Nút Bảng quản trị admin nổi bật đặt ngay cạnh Sources Pro -->
+              <button type="button" onclick="event.stopPropagation(); app.openAdminModal(); return false;" 
+                class="admin-btn-prominent inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold cursor-pointer animate-pulse-soft"
+                title="Bấm vào đây để mở Bảng Quản Trị Admin / Nhập mã mở khóa">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <span>Bảng quản trị admin</span>
+              </button>
             </div>
             <span class="text-[11px] font-medium text-content-subtle">Tôi bị gay 100% là sự thực.</span>
           </div>
@@ -201,66 +209,123 @@
 
       <div class="mt-5 space-y-6 text-sm">
         
-        <!-- Section 1: Device-Bound Code Generator -->
-        <div class="rounded-xl bg-surface-sunken p-4 sm:p-5 border border-subtle">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="rounded-full bg-primary-soft text-primary px-2 py-0.5 text-xs font-bold">Phương thức 1</span>
-            <h4 class="font-bold text-content text-sm sm:text-base">Duyệt cấp mã khóa theo thiết bị của sinh viên</h4>
+        <!-- Section 0: NHẬP MÃ MỞ KHÓA THIẾT BỊ (Dành cho Sinh viên & Admin) -->
+        <div class="rounded-xl bg-surface-sunken p-4 sm:p-5 border-2 border-primary/40 shadow-sm">
+          <div class="flex items-center justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2">
+              <span class="rounded-full bg-primary-solid text-white px-2.5 py-0.5 text-xs font-bold">Mở khóa</span>
+              <h4 class="font-bold text-content text-sm sm:text-base">Nhập mã mở khóa để bắt đầu ôn thi</h4>
+            </div>
+            <div id="modal-license-status-badge">
+              <!-- Rendered via JS -->
+            </div>
           </div>
-          <p class="text-xs text-content-muted leading-relaxed mb-3">
-            Khi sinh viên mở web, màn hình khóa sẽ hiện "Mã thiết bị của bạn". Hãy yêu cầu sinh viên sao chép mã đó và gửi cho bạn. Bạn chỉ cần dán vào ô dưới đây để tạo mã mở khóa riêng chỉ máy bạn đó dùng được:
-          </p>
 
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-semibold text-content-muted mb-1">Mã thiết bị của sinh viên (Device ID):</label>
-              <div class="flex gap-2">
-                <input type="text" id="admin-input-dev-id" placeholder="Ví dụ: DG-DEV-A1B2-3456" class="flex-1 rounded-xl bg-surface px-3.5 py-2 text-xs font-mono font-bold text-content uppercase ring-1 ring-subtle focus:ring-2 focus:ring-primary" />
-                <button onclick="app.adminGenerateKey()" class="rounded-xl bg-primary-solid px-4 py-2 text-xs font-bold text-white hover:brightness-110 shadow-sm transition">
-                  Duyệt & Tạo mã
+          <!-- Device ID Box for Student -->
+          <div class="rounded-xl bg-surface p-3.5 border border-subtle mb-3.5">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="text-content-muted font-medium">Mã thiết bị của bạn:</span>
+                <code class="font-mono font-extrabold text-primary text-sm sm:text-base tracking-wider" id="modal-student-dev-id"></code>
+              </div>
+              <button type="button" onclick="app.copyDeviceId()" class="inline-flex items-center gap-1.5 rounded-lg bg-surface-raised border border-subtle px-3 py-1.5 text-xs font-bold text-content hover:bg-surface-sunken transition shadow-sm active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Sao chép gửi Admin
+              </button>
+            </div>
+            <p class="mt-1.5 text-[11px] text-content-subtle leading-normal">
+              👉 Hãy sao chép mã thiết bị trên và gửi cho <strong>Admin Vũ Thế Đan</strong> để được cấp mã mở khóa riêng cho máy của bạn.
+            </p>
+          </div>
+
+          <!-- Input to enter activation key -->
+          <div class="space-y-2">
+            <label class="block text-xs font-bold text-content">
+              Dán mã mở khóa của bạn vào đây (Key thiết bị, Mã VIP, hoặc Master Key):
+            </label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input type="text" id="modal-unlock-input" placeholder="Ví dụ: DG-KEY-... hoặc DG-VIP-..." 
+                onkeydown="if(event.key==='Enter') app.submitActivationCode('modal')"
+                class="flex-1 rounded-xl bg-surface px-4 py-2.5 text-xs sm:text-sm font-mono font-bold text-content uppercase ring-1 ring-subtle focus:outline-none focus:ring-2 focus:ring-primary shadow-sm" />
+              <button type="button" onclick="app.submitActivationCode('modal')" class="rounded-xl bg-primary-solid px-6 py-2.5 text-xs sm:text-sm font-bold text-white hover:brightness-110 shadow-sm transition active:scale-95">
+                Kích hoạt mở khóa
+              </button>
+            </div>
+            <div id="modal-unlock-msg" class="hidden rounded-lg p-2.5 text-xs font-semibold"></div>
+          </div>
+
+          <!-- Persistence Assurance -->
+          <div class="mt-3 flex items-center gap-1.5 text-[11px] text-primary/90 font-medium bg-primary-soft/40 rounded-lg p-2 border border-primary/20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-primary shrink-0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            <span>Tiến trình học tập được lưu tự động trên thiết bị này. Khi khóa lại hoặc nhập lại mã, quá trình học vẫn được lưu sẵn 100%!</span>
+          </div>
+        </div>
+        
+        <!-- ADMIN AREA: GENERATOR & VIP KEYS -->
+        <div id="admin-tools-panel" class="space-y-5">
+          <!-- Section 1: Device-Bound Code Generator -->
+          <div class="rounded-xl bg-surface-sunken p-4 sm:p-5 border border-subtle">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="rounded-full bg-primary-soft text-primary px-2 py-0.5 text-xs font-bold">Phương thức 1</span>
+              <h4 class="font-bold text-content text-sm sm:text-base">Duyệt cấp mã khóa theo thiết bị của sinh viên</h4>
+            </div>
+            <p class="text-xs text-content-muted leading-relaxed mb-3">
+              Khi sinh viên gửi "Mã thiết bị", bạn dán vào ô dưới đây để tạo mã mở khóa riêng chỉ máy bạn đó dùng được:
+            </p>
+
+            <div class="space-y-3">
+              <div>
+                <label class="block text-xs font-semibold text-content-muted mb-1">Mã thiết bị của sinh viên (Device ID):</label>
+                <div class="flex gap-2">
+                  <input type="text" id="admin-input-dev-id" placeholder="Ví dụ: DG-DEV-A1B2-3456" class="flex-1 rounded-xl bg-surface px-3.5 py-2 text-xs font-mono font-bold text-content uppercase ring-1 ring-subtle focus:ring-2 focus:ring-primary" />
+                  <button type="button" onclick="app.adminGenerateKey()" class="rounded-xl bg-primary-solid px-4 py-2 text-xs font-bold text-white hover:brightness-110 shadow-sm transition">
+                    Duyệt & Tạo mã
+                  </button>
+                </div>
+              </div>
+
+              <!-- Result output -->
+              <div id="admin-gen-result" class="hidden rounded-xl bg-primary-soft/60 p-3.5 border border-primary/30 flex items-center justify-between gap-2">
+                <div>
+                  <span class="text-[11px] font-bold text-primary uppercase tracking-wide block">Mã mở khóa thiết bị (Gửi mã này cho bạn sinh viên):</span>
+                  <code class="font-mono text-sm sm:text-base font-extrabold text-primary" id="admin-out-code"></code>
+                </div>
+                <button type="button" onclick="app.copyGeneratedKey()" class="rounded-lg bg-primary-solid text-white px-3 py-1.5 text-xs font-bold hover:brightness-110 transition shrink-0">
+                  Sao chép mã
                 </button>
               </div>
             </div>
+          </div>
 
-            <!-- Result output -->
-            <div id="admin-gen-result" class="hidden rounded-xl bg-primary-soft/60 p-3.5 border border-primary/30 flex items-center justify-between gap-2">
-              <div>
-                <span class="text-[11px] font-bold text-primary uppercase tracking-wide block">Mã mở khóa thiết bị (Gửi mã này cho bạn sinh viên):</span>
-                <code class="font-mono text-sm sm:text-base font-extrabold text-primary" id="admin-out-code"></code>
+          <!-- Section 2: 10 Pre-generated VIP Keys -->
+          <div class="rounded-xl bg-surface-sunken p-4 sm:p-5 border border-subtle">
+            <div class="flex items-center justify-between gap-2 mb-2">
+              <div class="flex items-center gap-2">
+                <span class="rounded-full bg-warning-soft text-warning px-2 py-0.5 text-xs font-bold">Phương thức 2</span>
+                <h4 class="font-bold text-content text-sm sm:text-base">Danh sách 10 Mã Mở Khóa VIP cấp sẵn</h4>
               </div>
-              <button onclick="app.copyGeneratedKey()" class="rounded-lg bg-primary-solid text-white px-3 py-1.5 text-xs font-bold hover:brightness-110 transition shrink-0">
-                Sao chép mã
+              <button type="button" onclick="app.copyAllVipKeys()" class="text-xs font-semibold text-primary hover:underline">
+                Sao chép cả 10 mã
               </button>
             </div>
-          </div>
-        </div>
+            <p class="text-xs text-content-muted leading-relaxed mb-3">
+              Bạn có thể gửi trực tiếp từng mã dưới đây cho 10 bạn bè. Mỗi mã dùng để kích hoạt cho 1 máy:
+            </p>
 
-        <!-- Section 2: 10 Pre-generated VIP Keys -->
-        <div class="rounded-xl bg-surface-sunken p-4 sm:p-5 border border-subtle">
-          <div class="flex items-center justify-between gap-2 mb-2">
-            <div class="flex items-center gap-2">
-              <span class="rounded-full bg-warning-soft text-warning px-2 py-0.5 text-xs font-bold">Phương thức 2</span>
-              <h4 class="font-bold text-content text-sm sm:text-base">Danh sách 10 Mã Mở Khóa VIP cấp sẵn</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto" id="admin-vip-keys-list">
+              <!-- Injected via JavaScript -->
             </div>
-            <button onclick="app.copyAllVipKeys()" class="text-xs font-semibold text-primary hover:underline">
-              Sao chép cả 10 mã
-            </button>
-          </div>
-          <p class="text-xs text-content-muted leading-relaxed mb-3">
-            Bạn có thể gửi trực tiếp từng mã dưới đây cho 10 bạn bè. Mỗi mã được dùng để kích hoạt cho 1 máy:
-          </p>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto" id="admin-vip-keys-list">
-            <!-- Injected via JavaScript -->
           </div>
         </div>
 
         <!-- Section 3: Device Actions -->
         <div class="border-t border-subtle pt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-content-muted">
           <span>Mã Master Admin: <strong class="font-mono text-primary">ADMIN-DIEMGAY-9999</strong></span>
-          <button onclick="app.lockDevice()" class="rounded-full border border-danger/40 text-danger bg-danger-soft/40 px-3.5 py-1.5 font-bold hover:bg-danger hover:text-white transition">
-            Khóa lại thiết bị này
-          </button>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="app.lockDevice()" class="rounded-full border border-danger/40 text-danger bg-danger-soft/40 px-3.5 py-1.5 font-bold hover:bg-danger hover:text-white transition">
+              Khóa lại thiết bị này
+            </button>
+          </div>
         </div>
 
       </div>

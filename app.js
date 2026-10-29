@@ -310,6 +310,7 @@ class DiemGayApp {
 
   // --- RENDER MAIN VIEW ---
   render() {
+    this.updateHeaderLockState();
     const main = document.getElementById('main-content');
     if (!main) return;
 
@@ -486,7 +487,13 @@ class DiemGayApp {
           </div>
 
           <!-- Quick Action Button -->
-          ${nextBatch ? `
+          ${!this.isUnlocked ? `
+            <button onclick="app.openAdminModal()" class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500/20 text-amber-500 border border-amber-500/40 px-4 py-3 font-bold hover:bg-amber-500 hover:text-white shadow-sm transition-all group relative cursor-pointer" title="Bấm vào Bảng quản trị admin để mở khóa">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>Chưa mở khóa — Bấm vào Bảng quản trị admin để mở khóa</span>
+              <div class="part-lock-tooltip">Bấm vào Bảng quản trị admin để mở khóa</div>
+            </button>
+          ` : (nextBatch ? `
             <button onclick="app.startBatch(${nextBatch.index}, 'learn')" class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary-solid px-4 py-3 font-semibold text-primary-on-solid shadow-md shadow-primary/20 hover:brightness-95 transition-all active:scale-[0.99]">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
               Học tiếp phần ${nextBatch.index + 1} · câu ${nextBatch.from}–${nextBatch.to}
@@ -495,7 +502,7 @@ class DiemGayApp {
             <div class="mt-4 rounded-xl bg-primary-soft p-3.5 text-center text-sm font-semibold text-primary">
               🎉 Bạn đã học hết tất cả ${totalBatches} phần của môn này!
             </div>
-          `}
+          `)}
 
           <!-- Review all marked questions pill -->
           ${allStillIds.length > 0 ? `
@@ -521,15 +528,24 @@ class DiemGayApp {
             ${batchList.map(b => `
               <div class="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-surface-raised p-3.5 sm:px-4 shadow-card ring-1 ring-subtle hover:ring-strong transition-all">
                 
-                <!-- Left: Complete toggle & Label -->
+                <!-- Left: Complete toggle OR Lock Icon with Tooltip -->
                 <div class="flex items-center gap-3">
-                  <button onclick="app.toggleBatchDone(${b.index})" title="${b.isDone ? 'Bỏ đánh dấu xong' : 'Đánh dấu đã xong'}" class="grid size-8 shrink-0 place-items-center rounded-full ring-1 transition-colors ${
-                    b.isDone
-                      ? 'bg-primary-solid text-primary-on-solid ring-primary'
-                      : 'bg-surface text-content-muted ring-subtle hover:ring-strong'
-                  }">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                  </button>
+                  ${this.isUnlocked ? `
+                    <button onclick="app.toggleBatchDone(${b.index})" title="${b.isDone ? 'Bỏ đánh dấu xong' : 'Đánh dấu đã xong'}" class="grid size-8 shrink-0 place-items-center rounded-full ring-1 transition-colors ${
+                      b.isDone
+                        ? 'bg-primary-solid text-primary-on-solid ring-primary'
+                        : 'bg-surface text-content-muted ring-subtle hover:ring-strong'
+                    }">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    </button>
+                  ` : `
+                    <div class="part-lock-wrapper group cursor-pointer" onclick="app.openAdminModal()" title="Bấm vào Bảng quản trị admin để mở khóa">
+                      <div class="grid size-8 shrink-0 place-items-center rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/40 group-hover:bg-amber-500 group-hover:text-white transition-all shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      </div>
+                      <div class="part-lock-tooltip">Bấm vào Bảng quản trị admin để mở khóa</div>
+                    </div>
+                  `}
 
                   <div>
                     <div class="flex items-center gap-2">
@@ -544,17 +560,32 @@ class DiemGayApp {
                   </div>
                 </div>
 
-                <!-- Right: Study & Flashcard Action Buttons -->
-                <div class="flex items-center gap-2 ml-auto">
-                  <button onclick="app.startBatch(${b.index}, 'learn')" class="btn-part-hoc">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-                    Học
-                  </button>
-                  <button onclick="app.startBatch(${b.index}, 'flashcard')" class="btn-part-card">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
-                    Thẻ ghi nhớ
-                  </button>
-                </div>
+                <!-- Right: Study & Flashcard Action Buttons (Locked or Active) -->
+                ${this.isUnlocked ? `
+                  <div class="flex items-center gap-2 ml-auto">
+                    <button onclick="app.startBatch(${b.index}, 'learn')" class="btn-part-hoc">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                      Học
+                    </button>
+                    <button onclick="app.startBatch(${b.index}, 'flashcard')" class="btn-part-card">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+                      Thẻ ghi nhớ
+                    </button>
+                  </div>
+                ` : `
+                  <div class="flex items-center gap-2 ml-auto">
+                    <button onclick="app.openAdminModal()" class="btn-part-locked group/btn relative cursor-pointer" title="Bấm vào Bảng quản trị admin để mở khóa">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      Học
+                      <div class="part-lock-tooltip">Bấm vào Bảng quản trị admin để mở khóa</div>
+                    </button>
+                    <button onclick="app.openAdminModal()" class="btn-part-locked group/btn relative cursor-pointer" title="Bấm vào Bảng quản trị admin để mở khóa">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      Thẻ ghi nhớ
+                      <div class="part-lock-tooltip">Bấm vào Bảng quản trị admin để mở khóa</div>
+                    </button>
+                  </div>
+                `}
 
               </div>
             `).join('')}
@@ -579,6 +610,11 @@ class DiemGayApp {
   }
 
   startBatch(batchIndex, mode = 'learn') {
+    if (!this.isUnlocked) {
+      this.showToast('Vui lòng mở khóa tại Bảng quản trị admin để học phần này!', 'warning');
+      this.openAdminModal(true);
+      return;
+    }
     this.currentBatchIndex = batchIndex;
     this.currentBatchMode = mode;
     this.isReviewMode = false;
@@ -589,6 +625,11 @@ class DiemGayApp {
   }
 
   startReviewSession(questionIds, mode = 'learn') {
+    if (!this.isUnlocked) {
+      this.showToast('Vui lòng mở khóa tại Bảng quản trị admin để ôn lại!', 'warning');
+      this.openAdminModal(true);
+      return;
+    }
     if (!questionIds || questionIds.length === 0) return;
     this.currentBatchIndex = null;
     this.isReviewMode = true;
@@ -1007,6 +1048,11 @@ class DiemGayApp {
     }
   }
 
+  isPickedCorrect(q) {
+    if (!q || !q.correctArr || q.correctArr.length === 0) return false;
+    return q.correctArr.every(a => this.pickedAnswers.includes(a)) && this.pickedAnswers.length === q.correctArr.length;
+  }
+
   navigateQuestion(delta) {
     const questions = this.getSubjectQuestions();
     const progress = this.getSubjectProgress();
@@ -1019,6 +1065,14 @@ class DiemGayApp {
       const start = this.currentBatchIndex * batchSize;
       const end = start + batchSize;
       activeQuestions = questions.slice(start, end);
+    }
+
+    // Auto-record status if answer was checked and not yet marked explicitly
+    const currentQ = activeQuestions[this.currentQuestionIndex];
+    if (currentQ && this.isChecked && !progress.statuses[currentQ.id]) {
+      const isCorrect = this.isPickedCorrect(currentQ);
+      progress.statuses[currentQ.id] = isCorrect ? 'know' : 'still';
+      this.saveSubjectProgress(progress);
     }
 
     const nextIdx = this.currentQuestionIndex + delta;
@@ -1109,6 +1163,25 @@ class DiemGayApp {
   // VIEW 2: EXAM SIMULATION (THI THỬ 60 PHÚT)
   // ==========================================
   renderExamView() {
+    if (!this.isUnlocked) {
+      return `
+        <div class="mx-auto max-w-xl px-4 py-12 text-center animate-in fade-in">
+          <div class="rounded-2xl bg-surface-raised p-8 shadow-card ring-1 ring-subtle border border-amber-500/30">
+            <div class="mx-auto grid size-16 place-items-center rounded-2xl bg-amber-500/15 text-amber-500 mb-4 border border-amber-500/30">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h2 class="font-display text-xl font-bold text-content">Tính năng Thi Thử Đang Bị Khóa</h2>
+            <p class="mt-2 text-sm text-content-muted leading-relaxed">
+              Vui lòng mở khóa thiết bị tại Bảng quản trị admin để tham gia thi thử mô phỏng 60 phút và tính điểm chuẩn xác.
+            </p>
+            <button onclick="app.openAdminModal()" class="mt-5 inline-flex items-center gap-2 rounded-full bg-primary-solid px-6 py-2.5 text-sm font-bold text-primary-on-solid hover:brightness-110 shadow-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Bấm vào Bảng quản trị admin để mở khóa
+            </button>
+          </div>
+        </div>
+      `;
+    }
     if (!this.exam.active && !this.exam.submitted) {
       return this.renderExamSetupView();
     } else if (this.exam.active) {
@@ -1179,6 +1252,11 @@ class DiemGayApp {
   }
 
   startExam() {
+    if (!this.isUnlocked) {
+      this.showToast('Vui lòng mở khóa tại Bảng quản trị admin để tham gia thi thử!', 'warning');
+      this.openAdminModal(true);
+      return;
+    }
     const questions = [...this.getSubjectQuestions()];
     const count = Math.min(this.examQuestionCount || 40, questions.length);
     const minutes = this.examMinutes || 60;
@@ -1441,6 +1519,25 @@ class DiemGayApp {
   // VIEW 3: INSTANT SEARCH (TRA CỨU NHANH)
   // ==========================================
   renderSearchView() {
+    if (!this.isUnlocked) {
+      return `
+        <div class="mx-auto max-w-xl px-4 py-12 text-center animate-in fade-in">
+          <div class="rounded-2xl bg-surface-raised p-8 shadow-card ring-1 ring-subtle border border-amber-500/30">
+            <div class="mx-auto grid size-16 place-items-center rounded-2xl bg-amber-500/15 text-amber-500 mb-4 border border-amber-500/30">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h2 class="font-display text-xl font-bold text-content">Tính năng Tra Cứu Đang Bị Khóa</h2>
+            <p class="mt-2 text-sm text-content-muted leading-relaxed">
+              Vui lòng mở khóa thiết bị tại Bảng quản trị admin để tra cứu siêu tốc trong toàn bộ kho 1.317 câu hỏi.
+            </p>
+            <button onclick="app.openAdminModal()" class="mt-5 inline-flex items-center gap-2 rounded-full bg-primary-solid px-6 py-2.5 text-sm font-bold text-primary-on-solid hover:brightness-110 shadow-md">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Bấm vào Bảng quản trị admin để mở khóa
+            </button>
+          </div>
+        </div>
+      `;
+    }
     const questions = this.getSubjectQuestions();
     let filtered = questions;
 
@@ -1841,17 +1938,26 @@ class DiemGayApp {
     `;
   }
 
-  submitActivationCode(source = 'main') {
-    const inputEl = source === 'header' 
-      ? document.getElementById('header-unlock-input')
-      : document.getElementById('main-unlock-input');
+  submitActivationCode(source = 'modal') {
+    let inputEl = null;
+    let errorEl = null;
+    if (source === 'modal') {
+      inputEl = document.getElementById('modal-unlock-input');
+      errorEl = document.getElementById('modal-unlock-msg');
+    } else if (source === 'header') {
+      inputEl = document.getElementById('header-unlock-input');
+      errorEl = document.getElementById('lock-error-msg');
+    } else {
+      inputEl = document.getElementById('main-unlock-input');
+      errorEl = document.getElementById('lock-error-msg');
+    }
 
     if (!inputEl) return;
     const code = (inputEl.value || '').trim().toUpperCase();
-    const errorEl = document.getElementById('lock-error-msg');
 
     if (!code) {
       if (errorEl) {
+        errorEl.className = 'mt-2 rounded-lg p-2.5 text-xs font-semibold bg-danger-soft text-danger border border-danger/30';
         errorEl.innerText = 'Vui lòng nhập mã mở khóa!';
         errorEl.classList.remove('hidden');
       }
@@ -1861,7 +1967,22 @@ class DiemGayApp {
 
     const myDevId = this.deviceId;
 
-    // Check Master Admin Key
+    const onSuccess = (role, toastMsg) => {
+      this.isUnlocked = true;
+      if (errorEl) {
+        errorEl.className = 'mt-2 rounded-lg p-2.5 text-xs font-semibold bg-primary-soft text-primary border border-primary/30';
+        errorEl.innerText = '✓ Kích hoạt thành công!';
+        errorEl.classList.remove('hidden');
+      }
+      this.showToast(toastMsg, 'success');
+      this.renderSubjectTabs();
+      this.render();
+      setTimeout(() => {
+        this.openAdminModal(false);
+      }, 1000);
+    };
+
+    // 1. Check Master Admin Key
     if (code === ADMIN_MASTER_KEY) {
       localStorage.setItem('diemgay_license', JSON.stringify({
         key: code,
@@ -1869,15 +1990,11 @@ class DiemGayApp {
         role: 'ADMIN',
         activatedAt: new Date().toISOString()
       }));
-      this.isUnlocked = true;
-      this.showToast('🎉 Đã mở khóa với quyền Quản Trị Viên (Admin)!', 'success');
-      this.renderSubjectTabs();
-      this.render();
-      this.openAdminModal(true);
+      onSuccess('ADMIN', '🎉 Đã mở khóa với quyền Quản Trị Viên (Admin)!');
       return;
     }
 
-    // Check VIP Keys
+    // 2. Check VIP Keys
     if (VIP_KEYS.includes(code)) {
       localStorage.setItem('diemgay_license', JSON.stringify({
         key: code,
@@ -1885,14 +2002,11 @@ class DiemGayApp {
         role: 'VIP',
         activatedAt: new Date().toISOString()
       }));
-      this.isUnlocked = true;
-      this.showToast('🎉 Kích hoạt mã VIP thành công cho thiết bị này!', 'success');
-      this.renderSubjectTabs();
-      this.render();
+      onSuccess('VIP', '🎉 Kích hoạt mã VIP thành công cho thiết bị này!');
       return;
     }
 
-    // Check Device-Bound Key
+    // 3. Check Device-Bound Key
     const expectedKey = generateKeyForDevice(myDevId);
     if (code === expectedKey) {
       localStorage.setItem('diemgay_license', JSON.stringify({
@@ -1901,16 +2015,14 @@ class DiemGayApp {
         role: 'STUDENT',
         activatedAt: new Date().toISOString()
       }));
-      this.isUnlocked = true;
-      this.showToast('🎉 Kích hoạt thiết bị thành công! Chúc bạn ôn thi tốt!', 'success');
-      this.renderSubjectTabs();
-      this.render();
+      onSuccess('STUDENT', '🎉 Kích hoạt thiết bị thành công! Chúc bạn ôn thi tốt!');
       return;
     }
 
     // If invalid
     const errMsg = '❌ Mã mở khóa không hợp lệ hoặc không thuộc về thiết bị này! Vui lòng sao chép mã thiết bị gửi Admin duyệt.';
     if (errorEl) {
+      errorEl.className = 'mt-2 rounded-lg p-2.5 text-xs font-semibold bg-danger-soft text-danger border border-danger/30';
       errorEl.innerText = errMsg;
       errorEl.classList.remove('hidden');
     }
@@ -1921,14 +2033,14 @@ class DiemGayApp {
     navigator.clipboard.writeText(this.deviceId).then(() => {
       this.showToast('Đã sao chép mã thiết bị: ' + this.deviceId, 'success');
     }).catch(() => {
-      const el = document.getElementById('lock-screen-device-id');
+      const el = document.getElementById('modal-student-dev-id') || document.getElementById('lock-screen-device-id');
       if (el) {
         const range = document.createRange();
         range.selectNodeContents(el);
         const sel = window.getSelection();
         sel.removeAllRanges();
         sel.addRange(range);
-        this.showToast('Hãy bôi đen và nhấn Ctrl + C để sao chép!', 'info');
+        this.showToast('Hãy nhấn Ctrl + C để sao chép mã!', 'info');
       }
     });
   }
@@ -1938,25 +2050,31 @@ class DiemGayApp {
     if (!modal) return;
 
     if (show) {
-      const lic = this.getLicenseInfo();
-      if (!this.isUnlocked || (lic && lic.role !== 'ADMIN' && lic.key !== ADMIN_MASTER_KEY)) {
-        const pass = prompt('Nhập mật mã Quản trị viên (Master Admin Key):');
-        if (pass && pass.trim().toUpperCase() === ADMIN_MASTER_KEY) {
-          localStorage.setItem('diemgay_license', JSON.stringify({
-            key: ADMIN_MASTER_KEY,
-            deviceId: this.deviceId,
-            role: 'ADMIN',
-            activatedAt: new Date().toISOString()
-          }));
-          this.isUnlocked = true;
-          this.render();
+      // 1. Populate Device ID for student
+      const devEl = document.getElementById('modal-student-dev-id');
+      if (devEl) devEl.innerText = this.deviceId;
+
+      // 2. Clear previous error/input
+      const inputEl = document.getElementById('modal-unlock-input');
+      if (inputEl) inputEl.value = '';
+      const msgEl = document.getElementById('modal-unlock-msg');
+      if (msgEl) msgEl.classList.add('hidden');
+
+      // 3. Update status badge in modal
+      const statusBadge = document.getElementById('modal-license-status-badge');
+      if (statusBadge) {
+        if (this.isUnlocked) {
+          const lic = this.getLicenseInfo();
+          const roleLabel = lic ? (lic.role === 'ADMIN' ? 'Admin Master' : lic.role === 'VIP' ? 'Mã VIP' : 'Đã kích hoạt') : 'Đã mở khóa';
+          statusBadge.innerHTML = `<span class="rounded-full bg-primary-soft text-primary border border-primary/30 px-2.5 py-0.5 text-xs font-bold">✓ ${roleLabel}</span>`;
         } else {
-          if (pass !== null) alert('Mật mã Quản trị viên không chính xác!');
-          return;
+          statusBadge.innerHTML = `<span class="rounded-full bg-danger-soft text-danger border border-danger/30 px-2.5 py-0.5 text-xs font-bold">🔒 Chưa mở khóa</span>`;
         }
       }
 
+      // 4. Render 10 VIP keys
       this.renderAdminVipKeys();
+
       modal.classList.remove('hidden');
     } else {
       modal.classList.add('hidden');
@@ -2033,7 +2151,7 @@ class DiemGayApp {
     localStorage.removeItem('diemgay_license');
     this.isUnlocked = false;
     this.openAdminModal(false);
-    this.showToast('Đã khóa lại thiết bị!', 'info');
+    this.showToast('Đã khóa lại thiết bị! Tiến trình học tập vẫn được lưu an toàn 100%.', 'info');
     this.render();
   }
 
